@@ -171,6 +171,7 @@ default/Makefile
 default/backgrounds/Makefile
 default/config/Makefile
 default/config/tizen-wearable/Makefile
+default/themes/Makefile
 ])
 AC_OUTPUT([
 ])
