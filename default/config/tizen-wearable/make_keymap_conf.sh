@@ -12,12 +12,18 @@ KEYROUTER_CONFIG_FILE_PATH="default/config/tizen-${TIZEN_PROFILE}/module.keyrout
 KEYROUTER_TEMP_FILE_PATH="default/config/tizen-${TIZEN_PROFILE}/module.keyrouter.src.temp"
 DEVICEMGR_CONFIG_FILE_PATH="default/config/tizen-${TIZEN_PROFILE}/module.devicemgr.src"
 DEVICEMGR_TEMP_FILE_PATH="default/config/tizen-${TIZEN_PROFILE}/module.devicemgr.src.temp"
+GESTURE_CONFIG_FILE_PATH="default/config/tizen-${TIZEN_PROFILE}/module.gesture.src"
+GESTURE_TEMP_FILE_PATH="default/config/tizen-${TIZEN_PROFILE}/module.gesture.src.temp"
 WS="   "
 KEYGAP=8
 
 DEVICEMGR_BACK_KEY_OPTION=0
 DEVICEMGR_COMBINE_KEY_OPTION=0
+GESTURE_BACK_KEY_OPTION=0
+GESTURE_COMBINE_KEY_OPTION=0
 BACK_KEY_CODE=0
+POWER_KEY_CODE=0
+
 if [ -e ${KEYMAP_FILE_PATH} ]
 then
 	echo "${TIZEN_PROFILE} have a key layout file: ${KEYMAP_FILE_PATH}"
@@ -69,6 +75,7 @@ else
 		VAL_KEYCODE=$(echo $KEYCODE | awk '{print $1}')
 
 		[[ $KEYNAME == "XF86Back" ]] && BACK_KEY_CODE=$VAL_KEYCODE
+		[[ $KEYNAME == "XF86PowerOff" ]] && POWER_KEY_CODE=$VAL_KEYCODE
 	done < ${KEYMAP_FILE_PATH}
 fi
 
@@ -116,4 +123,37 @@ then
 
 		mv $DEVICEMGR_TEMP_FILE_PATH $DEVICEMGR_CONFIG_FILE_PATH
 	fi
+fi
+
+if [ -e ${GESTURE_CONFIG_FILE_PATH} ]
+then
+echo "Check a gesture config file"
+while read VTEMP VALUE_NAME VALUE_TYPE VALUE
+do
+	if [ "$BACK_KEY_CODE" != "0" ]
+	then
+	[[ $VALUE_NAME == *"back_key"* ]] && GESTURE_BACK_KEY_OPTION=1
+	fi
+	if [ "$POWER_KEY_CODE" != "0" ]
+	then
+	[[ $VALUE_NAME == *"combine_key"* ]] && GESTURE_COMBINE_KEY_OPTION=1
+	fi
+
+	if [ $GESTURE_BACK_KEY_OPTION == 1 ]
+	then
+		BACK_KEY_CODE=$(echo $BACK_KEY_CODE $KEYGAP | awk '{print $1 + $2}')
+		VALUE=$BACK_KEY_CODE";"
+		GESTURE_BACK_KEY_OPTION=0
+	fi
+	if [ $GESTURE_COMBINE_KEY_OPTION == 1 ]
+	then
+		POWER_KEY_CODE=$(echo $POWER_KEY_CODE $KEYGAP | awk '{print $1 + $2}')
+		VALUE=$POWER_KEY_CODE";"
+		GESTURE_COMBINE_KEY_OPTION=0
+	fi
+
+	echo $VTEMP $VALUE_NAME $VALUE_TYPE $VALUE >> $GESTURE_TEMP_FILE_PATH
+done < ${GESTURE_CONFIG_FILE_PATH}
+
+mv $GESTURE_TEMP_FILE_PATH $GESTURE_CONFIG_FILE_PATH
 fi
