@@ -83,6 +83,15 @@ else
 	done < ${KEYMAP_FILE_PATH}
 fi
 
+if [ "$BACK_KEY_CODE" != "0" ]
+then
+	BACK_KEY_CODE=$(echo $BACK_KEY_CODE $KEYGAP | awk '{print $1 + $2}')
+fi
+if [ "$POWER_KEY_CODE" != "0" ]
+then
+	POWER_KEY_CODE=$(echo $POWER_KEY_CODE $KEYGAP | awk '{print $1 + $2}')
+fi
+
 if [ -e ${DEVICEMGR_CONFIG_FILE_PATH} ]
 then
 	FOUND_BACK_KEY=0
@@ -96,7 +105,6 @@ then
 
 		if [ $DEVICEMGR_BACK_KEY_OPTION == 1 ]
 		then
-			BACK_KEY_CODE=$(echo $BACK_KEY_CODE $KEYGAP | awk '{print $1 + $2}')
 			VALUE=$BACK_KEY_CODE";"
 			DEVICEMGR_BACK_KEY_OPTION=0
 			FOUND_BACK_KEY=1
@@ -114,7 +122,6 @@ then
 			echo $LINE
 			if [ "$MENU_HEADER" == "1" ]
 			then
-				BACK_KEY_CODE=$(echo $BACK_KEY_CODE $KEYGAP | awk '{print $1 + $2}')
 				echo "value \"input.back_keycode\" int: "$BACK_KEY_CODE";" >> $DEVICEMGR_TEMP_FILE_PATH
 				MENU_HEADER=2
 			fi
@@ -145,13 +152,11 @@ do
 
 	if [ $GESTURE_BACK_KEY_OPTION == 1 ]
 	then
-		BACK_KEY_CODE=$(echo $BACK_KEY_CODE $KEYGAP | awk '{print $1 + $2}')
 		VALUE=$BACK_KEY_CODE";"
 		GESTURE_BACK_KEY_OPTION=0
 	fi
 	if [ $GESTURE_COMBINE_KEY_OPTION == 1 ]
 	then
-		POWER_KEY_CODE=$(echo $POWER_KEY_CODE $KEYGAP | awk '{print $1 + $2}')
 		VALUE=$POWER_KEY_CODE";"
 		GESTURE_COMBINE_KEY_OPTION=0
 	fi
